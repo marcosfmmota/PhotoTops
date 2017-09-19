@@ -97,3 +97,10 @@ def histogram_equalization(image):
             image[i, j] = trans_func[image[i,j]]
 
     return image
+
+# def local_equalization(image):
+#     shape = image.shape
+#     padded_image = np.zeros(shape[0]+2, shape[1]+2)
+#
+#     for i in range(image.shape[0]):
+#         for j in range(image.shape[1]):
