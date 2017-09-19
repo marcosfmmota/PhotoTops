@@ -68,7 +68,7 @@ def histogram(image):
     hist = np.zeros(256)
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
-            hist[image[i, j]] += 1
+            hist[image[i,j]] += 1
 
     return hist
 
@@ -98,9 +98,16 @@ def histogram_equalization(image):
 
     return image
 
-# def local_equalization(image):
-#     shape = image.shape
-#     padded_image = np.zeros(shape[0]+2, shape[1]+2)
-#
-#     for i in range(image.shape[0]):
-#         for j in range(image.shape[1]):
+def local_equalization(image):
+
+    shape = image.shape
+
+    padded_image = np.zeros((shape[0]+2, shape[1]+2), dtype=int)
+    padded_image[-1:1,-1:1] = 255
+    padded_image [1:shape[0]+1,1:shape[1]+1] = image
+    for i in range(1,image.shape[0]+1):
+         for j in range(1, image.shape[1]+1):
+             local_im = padded_image[i-1:i+2,j-1:j+2]
+             padded_image[i-1:i+2,j-1:j+2] = histogram_equalization(local_im)
+    equalized_image = padded_image [1:shape[0]+1,1:shape[1]+1]
+    return equalized_image

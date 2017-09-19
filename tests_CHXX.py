@@ -75,4 +75,4 @@ def test_batch_CH03():
     test_histogram(dir_name, "Fig0316(1)(top_left).tif")
     test_histogram(dir_name, "Fig0316(2)(2nd_from_top).tif")
     test_histogram_equalization(dir_name, "Fig0316(1)(top_left).tif")
-    test_histogram_equalization(dir_name, "Fig0316(2)(2nd_from_top).tif)
+    test_histogram_equalization(dir_name, "Fig0316(2)(2nd_from_top).tif")
