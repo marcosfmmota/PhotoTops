@@ -1,2 +1,4 @@
 *.tif
 __pycache__
+.xml
+.idea/
