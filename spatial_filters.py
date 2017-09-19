@@ -36,6 +36,7 @@ def bit_plane_slicing(image, bit_array):
         for j in range(image.shape[1]):
             image[i, j] = image[i, j] & planes
 
+    return image
 
 def linear_funtion(p1, p2):
     slope = (p2[1] - p1[1]) / (p2[0] - p1[0])
@@ -72,12 +73,6 @@ def histogram(image):
 
     return hist
 
-
-def show_histogram(hist):
-
-    x_pos = np.arange(len(hist))
-    plt.bar(x_pos, hist, width=0.9)
-    plt.show()
 
 def histogram_equalization(image):
 
