@@ -96,14 +96,62 @@ def test_bit_plane_slicing(dirname, filename):
     plt.imshow(plane, cmap="gray")
     plt.show()
 
+def test_local_histogram_equalization(dirname, filename):
+
+    filename = os.path.join(dirname,filename)
+    image = io.imread(filename)
+    plt.imshow(image, cmap="gray")
+    plt.show()
+    image = sf.local_equalization(image)
+    plt.imshow(image, cmap="gray")
+    plt.show()
+
+def test_average(dirname, filename):
+
+    filename = os.path.join(dirname, filename)
+    image = io.imread(filename)
+    fig = plt.figure("Blur filter")
+    ax = fig.add_subplot(1, 2, 1)
+    ax.set_title("Original Image")
+    plt.imshow(image, cmap="gray")
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_title("Blured")
+    kernel = np.array([
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+    ])
+    plane = sf.convolve_average(image, kernel)
+    plt.imshow(plane, cmap="gray")
+    plt.show()
+
+
+def test_laplace(dirname, filename):
+
+    filename = os.path.join(dirname, filename)
+    image = io.imread(filename)
+    fig = plt.figure("Border detection")
+    ax = fig.add_subplot(1, 2, 1)
+    ax.set_title("Original Image")
+    plt.imshow(image, cmap="gray")
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_title("Laplace")
+    plane = sf.convolve_laplace(image)
+    plt.imshow(plane, cmap="gray")
+    plt.show()
+
+
 def test_batch_CH03():
     # dir_name = "/home/marcosfe/Documents/PhotoTops/DIP3E_CH03"
     dir_name = "C:\\Users\\MarcosFelipe\\Documents\\PhotoTops\\DIP3E_CH03"
-    test_negative(dir_name,"Fig0304(a)(breast_digital_Xray).tif")
-    test_logarithm(dir_name, "Fig0305(a)(DFT_no_log).tif")
-    test_gamma(dir_name, "Fig0307(a)(intensity_ramp).tif")
-    test_bit_plane_slicing(dir_name, "Fig0314(a)(100-dollars).tif")
-    test_histogram(dir_name, "Fig0316(1)(top_left).tif")
-    test_histogram(dir_name, "Fig0316(2)(2nd_from_top).tif")
-    test_histogram_equalization(dir_name, "Fig0309(a)(washed_out_aerial_image).tif")
-    test_histogram_equalization(dir_name, "Fig0316(2)(2nd_from_top).tif")
+    # test_negative(dir_name,"Fig0304(a)(breast_digital_Xray).tif")
+    # test_logarithm(dir_name, "Fig0305(a)(DFT_no_log).tif")
+    # test_gamma(dir_name, "Fig0307(a)(intensity_ramp).tif")
+    # test_bit_plane_slicing(dir_name, "Fig0314(a)(100-dollars).tif")
+    # test_histogram(dir_name, "Fig0316(1)(top_left).tif")
+    # test_histogram(dir_name, "Fig0316(2)(2nd_from_top).tif")
+    # test_histogram_equalization(dir_name, "Fig0309(a)(washed_out_aerial_image).tif")
+    # test_histogram_equalization(dir_name, "Fig0316(2)(2nd_from_top).tif")
+    # test_local_histogram_equalization(dir_name, "Fig0326(a)(embedded_square_noisy_512).tif")
+    test_average(dir_name, "Fig0338(a)(blurry_moon).tif")
+    # test_laplace(dir_name, "Fig0338(a)(blurry_moon).tif")

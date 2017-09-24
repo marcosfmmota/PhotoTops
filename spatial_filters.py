@@ -1,8 +1,9 @@
-from skimage import img_as_float
-from skimage import img_as_ubyte
+import math
 import matplotlib.pyplot as plt
 import numpy as np
-import math
+from skimage import img_as_float
+from skimage import img_as_ubyte
+
 
 def negative(image):
     for i in range(image.shape[0]):
@@ -37,6 +38,7 @@ def bit_plane_slicing(image, bit_array):
             image[i, j] = image[i, j] & planes
 
     return image
+
 
 def linear_funtion(p1, p2):
     slope = (p2[1] - p1[1]) / (p2[0] - p1[0])
@@ -93,16 +95,64 @@ def histogram_equalization(image):
 
     return image
 
+
 def local_equalization(image):
 
     shape = image.shape
 
-    padded_image = np.zeros((shape[0]+2, shape[1]+2), dtype=int)
-    padded_image[-1:1,-1:1] = 255
+    padded_image = np.zeros((shape[0]+2, shape[1]+2), dtype=np.uint8)
+    # padded_image[-1:1,-1:1] = 255
     padded_image [1:shape[0]+1,1:shape[1]+1] = image
-    for i in range(1,image.shape[0]+1):
-         for j in range(1, image.shape[1]+1):
-             local_im = padded_image[i-1:i+2,j-1:j+2]
-             padded_image[i-1:i+2,j-1:j+2] = histogram_equalization(local_im)
+    for i in range(1,shape[0]+1):
+        for j in range(1, shape[1]+1):
+            local_im = padded_image[i-1:i+2,j-1:j+2]
+            padded_image[i-1:i+2,j-1:j+2] = histogram_equalization(local_im)
     equalized_image = padded_image [1:shape[0]+1,1:shape[1]+1]
     return equalized_image
+
+
+def convolve2d(image, mask2d):
+
+    mask2d = np.fliplr(mask2d)
+
+    new_rows = mask2d.shape[0] - 1
+    new_columns = mask2d.shape[1] - 1
+    #number of rows and columns from the center of the mask
+    n_middle_r = new_rows // 2
+    n_middle_c = new_columns // 2
+    #create a new image with black boders
+    padded_image = np.zeros((image.shape[0] + new_rows, image.shape[1]+ new_columns))
+    padded_image[n_middle_r : image.shape[0] + n_middle_r, n_middle_c : image.shape[1] +  n_middle_c] = image
+
+    for i in range(n_middle_r , image.shape[0] + 1):
+        for j in range(n_middle_c , image.shape[1] + 1):
+            mask_array = np.reshape(mask2d, mask2d.size)
+            image_crop = padded_image[i - n_middle_r : i + n_middle_r + 1, j - n_middle_c : j + n_middle_c + 1]
+            image_crop_array = np.reshape(image_crop, image_crop.size)
+            convoluted_pixel = np.dot(image_crop_array, mask_array)
+            padded_image[i,j] = convoluted_pixel
+
+    conv_image = padded_image[n_middle_r : image.shape[0] + n_middle_r, n_middle_c : image.shape[1] +  n_middle_c]
+
+    return conv_image
+
+def convolve_average(image, kernel):
+
+    kernel_sum = np.dot(np.reshape(kernel, kernel.size), np.ones(kernel.size, dtype=np.uint8))
+
+    average = (1/kernel_sum) * kernel
+
+    average_im = convolve2d(image, average)
+    return average_im
+
+
+def convolve_laplace (image):
+
+    laplace = np.array([
+        [0, -1, 0],
+        [-1, 4, -1],
+        [0, -1, 0]
+    ])
+
+    im_laplace = convolve2d(image, laplace)
+    return im_laplace
