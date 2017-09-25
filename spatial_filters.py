@@ -146,6 +146,34 @@ def convolve_average(image, kernel):
     return average_im
 
 
+def convolve_percentil(image, kernel, percentil):
+
+    per_func = lambda a, p : np.sort(a)[int(a.size*p)]
+
+    new_rows = kernel.shape[0] - 1
+    new_columns = kernel.shape[1] - 1
+    # number of rows and columns from the center of the mask
+    n_middle_r = new_rows // 2
+    n_middle_c = new_columns // 2
+    # create a new image with black boders
+    padded_image = np.zeros((image.shape[0] + new_rows, image.shape[1] + new_columns))
+    padded_image[n_middle_r: image.shape[0] + n_middle_r, n_middle_c: image.shape[1] + n_middle_c] = image
+
+
+
+    for i in range(n_middle_r, image.shape[0] + 1):
+        for j in range(n_middle_c, image.shape[1] + 1):
+
+            image_crop = padded_image[i - n_middle_r: i + n_middle_r + 1, j - n_middle_c: j + n_middle_c + 1]
+            image_crop_array = np.reshape(image_crop, image_crop.size)
+            convoluted_pixel = per_func(image_crop_array, percentil)
+            padded_image[i, j] = convoluted_pixel
+
+    conv_image = padded_image[n_middle_r: image.shape[0] + n_middle_r, n_middle_c: image.shape[1] + n_middle_c]
+
+    return conv_image
+
+
 def convolve_laplace (image):
 
     laplace = np.array([

@@ -117,11 +117,30 @@ def test_average(dirname, filename):
     ax = fig.add_subplot(1, 2, 2)
     ax.set_title("Blured")
     kernel = np.array([
-        [1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1],
+        [1, 1, 1],
+        [1, 1, 1],
+        [1, 1, 1],
     ])
     plane = sf.convolve_average(image, kernel)
+    plt.imshow(plane, cmap="gray")
+    plt.show()
+
+def test_median(dirname, filename):
+
+    filename = os.path.join(dirname, filename)
+    image = io.imread(filename)
+    fig = plt.figure("Blur filter")
+    ax = fig.add_subplot(1, 2, 1)
+    ax.set_title("Original Image")
+    plt.imshow(image, cmap="gray")
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_title("Blured")
+    kernel = np.array([
+        [1, 1, 1],
+        [1, 1, 1],
+        [1, 1, 1],
+    ])
+    plane = sf.convolve_percentil(image, kernel, 0.50)
     plt.imshow(plane, cmap="gray")
     plt.show()
 
@@ -153,5 +172,6 @@ def test_batch_CH03():
     # test_histogram_equalization(dir_name, "Fig0309(a)(washed_out_aerial_image).tif")
     # test_histogram_equalization(dir_name, "Fig0316(2)(2nd_from_top).tif")
     # test_local_histogram_equalization(dir_name, "Fig0326(a)(embedded_square_noisy_512).tif")
-    test_average(dir_name, "Fig0338(a)(blurry_moon).tif")
+    #test_average(dir_name, "Fig0333(a)(test_pattern_blurring_orig).tif")
+    test_median(dir_name, "Fig0335(a)(ckt_board_saltpep_prob_pt05).tif")
     # test_laplace(dir_name, "Fig0338(a)(blurry_moon).tif")
