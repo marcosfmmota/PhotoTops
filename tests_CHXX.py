@@ -2,13 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 from skimage import io
-
+from skimage.util import img_as_float
 import spatial_filters as sf
 
 
 def test_negative(dir_name, filename):
 
-    filename = os.path.join(dir_name,filename)
+    filename = os.path.join(dir_name, filename)
     image = io.imread(filename)
     fig = plt.figure("Original vs. Negative")
     ax = fig.add_subplot(1, 2, 1)
@@ -34,7 +34,7 @@ def test_logarithm(dir_name, filename):
 
 def test_gamma(dir_name, filename):
 
-    filename = os.path.join(dir_name,filename)
+    filename = os.path.join(dir_name, filename)
     image = io.imread(filename)
     fig = plt.figure("Original vs. Negative")
     ax = fig.add_subplot(1, 2, 1)
@@ -44,9 +44,10 @@ def test_gamma(dir_name, filename):
     plt.imshow(p_image, cmap="gray")
     plt.show()
 
+
 def test_histogram(dir_name, filename):
 
-    filename = os.path.join(dir_name,filename)
+    filename = os.path.join(dir_name, filename)
     image = io.imread(filename)
     fig = plt.figure("Image vs Histogram")
     ax = fig.add_subplot(1, 2, 1)
@@ -57,9 +58,10 @@ def test_histogram(dir_name, filename):
     plt.bar(x_pos, hist, width=1.0)
     plt.show()
 
+
 def test_histogram_equalization(dir_name, filename):
 
-    filename = os.path.join(dir_name,filename)
+    filename = os.path.join(dir_name, filename)
     image = io.imread(filename)
     fig = plt.figure("Histogram Equalization")
     ax = fig.add_subplot(2, 2, 1)
@@ -73,7 +75,7 @@ def test_histogram_equalization(dir_name, filename):
     eq_image = sf.histogram_equalization(image)
     ax = fig.add_subplot(2, 2, 3)
     ax.set_title("Equalized Image")
-    plt.imshow(eq_image, cmap = "gray")
+    plt.imshow(eq_image, cmap="gray")
     ax = fig.add_subplot(2, 2, 4)
     ax.set_title("Equalized Histogram")
     hist = sf.histogram(image)
@@ -92,19 +94,36 @@ def test_bit_plane_slicing(dirname, filename):
     plt.imshow(image, cmap="gray")
     ax = fig.add_subplot(1, 2, 2)
     ax.set_title("Bit Plane")
-    plane = sf.bit_plane_slicing(image,[1, 1, 1, 1, 1, 1, 1, 1])
+    plane = sf.bit_plane_slicing(image, [0, 0, 0, 0, 1, 1, 1, 1])
     plt.imshow(plane, cmap="gray")
     plt.show()
 
+
+def test_contrast_stretching(dirname, filename):
+
+    filename = os.path.join(dirname, filename)
+    image = io.imread(filename)
+    fig = plt.figure("Contrast Streching")
+    ax = fig.add_subplot(1, 2, 1)
+    ax.set_title("Original Image")
+    plt.imshow(image, cmap="gray")
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_title("Contrast enhanced image")
+    sf.contrast_stretching(image, (128, 55), (168, 255))
+    plt.imshow(image, cmap="gray")
+    plt.show()
+
+
 def test_local_histogram_equalization(dirname, filename):
 
-    filename = os.path.join(dirname,filename)
+    filename = os.path.join(dirname, filename)
     image = io.imread(filename)
     plt.imshow(image, cmap="gray")
     plt.show()
     image = sf.local_equalization(image)
     plt.imshow(image, cmap="gray")
     plt.show()
+
 
 def test_average(dirname, filename):
 
@@ -125,6 +144,7 @@ def test_average(dirname, filename):
     plt.imshow(plane, cmap="gray")
     plt.show()
 
+
 def test_median(dirname, filename):
 
     filename = os.path.join(dirname, filename)
@@ -136,9 +156,11 @@ def test_median(dirname, filename):
     ax = fig.add_subplot(1, 2, 2)
     ax.set_title("Blured")
     kernel = np.array([
-        [1, 1, 1],
-        [1, 1, 1],
-        [1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1]
     ])
     plane = sf.convolve_percentil(image, kernel, 0.50)
     plt.imshow(plane, cmap="gray")
@@ -148,7 +170,7 @@ def test_median(dirname, filename):
 def test_laplace(dirname, filename):
 
     filename = os.path.join(dirname, filename)
-    image = io.imread(filename)
+    image = img_as_float(io.imread(filename))
     fig = plt.figure("Border detection")
     ax = fig.add_subplot(1, 2, 1)
     ax.set_title("Original Image")
@@ -160,6 +182,36 @@ def test_laplace(dirname, filename):
     plt.show()
 
 
+def test_highboost(dirname, filename):
+
+    filename = os.path.join(dirname, filename)
+    image = io.imread(filename)
+    fig = plt.figure("Border detection")
+    ax = fig.add_subplot(1, 2, 1)
+    ax.set_title("Original Image")
+    plt.imshow(image, cmap="gray")
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_title("HighBoost Image")
+    plane = sf.highboost_filter(image)
+    plt.imshow(plane, cmap="gray")
+    plt.show()
+
+
+def test_sobel(dirname, filename):
+
+    filename = os.path.join(dirname, filename)
+    image = io.imread(filename)
+    fig = plt.figure("Border detection")
+    ax = fig.add_subplot(1, 2, 1)
+    ax.set_title("Original Image")
+    plt.imshow(image, cmap="gray")
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_title("Sobel")
+    plane = sf.convolve_sobel(image)
+    plt.imshow(plane, cmap="gray")
+    plt.show()
+
+
 def test_batch_CH03():
     # dir_name = "/home/marcosfe/Documents/PhotoTops/DIP3E_CH03"
     dir_name = "C:\\Users\\MarcosFelipe\\Documents\\PhotoTops\\DIP3E_CH03"
@@ -167,11 +219,13 @@ def test_batch_CH03():
     # test_logarithm(dir_name, "Fig0305(a)(DFT_no_log).tif")
     # test_gamma(dir_name, "Fig0307(a)(intensity_ramp).tif")
     # test_bit_plane_slicing(dir_name, "Fig0314(a)(100-dollars).tif")
+    # test_contrast_stretching(dir_name, "Fig0312(a)(kidney).tif")
     # test_histogram(dir_name, "Fig0316(1)(top_left).tif")
     # test_histogram(dir_name, "Fig0316(2)(2nd_from_top).tif")
     # test_histogram_equalization(dir_name, "Fig0309(a)(washed_out_aerial_image).tif")
-    # test_histogram_equalization(dir_name, "Fig0316(2)(2nd_from_top).tif")
     # test_local_histogram_equalization(dir_name, "Fig0326(a)(embedded_square_noisy_512).tif")
-    #test_average(dir_name, "Fig0333(a)(test_pattern_blurring_orig).tif")
-    test_median(dir_name, "Fig0335(a)(ckt_board_saltpep_prob_pt05).tif")
+    # test_average(dir_name, "Fig0333(a)(test_pattern_blurring_orig).tif")
+    # test_median(dir_name, "Fig0335(a)(ckt_board_saltpep_prob_pt05).tif")
+    test_highboost(dir_name, "Fig0340(a)(dipxe_text).tif")
     # test_laplace(dir_name, "Fig0338(a)(blurry_moon).tif")
+    # test_sobel(dir_name, "Fig0338(a)(blurry_moon).tif")
