@@ -4,6 +4,7 @@ import os
 from skimage import io
 from skimage.util import img_as_float
 import spatial_filters as sf
+import frequency_filters as ff
 
 
 def test_negative(dir_name, filename):
@@ -162,7 +163,7 @@ def test_median(dirname, filename):
         [1, 1, 1, 1, 1],
         [1, 1, 1, 1, 1]
     ])
-    plane = sf.convolve_percentil(image, kernel, 0.50)
+    plane = sf.convolve_percentil(image, kernel)
     plt.imshow(plane, cmap="gray")
     plt.show()
 
@@ -170,7 +171,7 @@ def test_median(dirname, filename):
 def test_laplace(dirname, filename):
 
     filename = os.path.join(dirname, filename)
-    image = img_as_float(io.imread(filename))
+    image = io.imread(filename)
     fig = plt.figure("Border detection")
     ax = fig.add_subplot(1, 2, 1)
     ax.set_title("Original Image")
@@ -212,6 +213,7 @@ def test_sobel(dirname, filename):
     plt.show()
 
 
+
 def test_batch_CH03():
     # dir_name = "/home/marcosfe/Documents/PhotoTops/DIP3E_CH03"
     dir_name = "C:\\Users\\MarcosFelipe\\Documents\\PhotoTops\\DIP3E_CH03"
@@ -224,8 +226,45 @@ def test_batch_CH03():
     # test_histogram(dir_name, "Fig0316(2)(2nd_from_top).tif")
     # test_histogram_equalization(dir_name, "Fig0309(a)(washed_out_aerial_image).tif")
     # test_local_histogram_equalization(dir_name, "Fig0326(a)(embedded_square_noisy_512).tif")
-    # test_average(dir_name, "Fig0333(a)(test_pattern_blurring_orig).tif")
+    test_average(dir_name, "Fig0333(a)(test_pattern_blurring_orig).tif")
     # test_median(dir_name, "Fig0335(a)(ckt_board_saltpep_prob_pt05).tif")
-    test_highboost(dir_name, "Fig0340(a)(dipxe_text).tif")
+    # test_highboost(dir_name, "Fig0340(a)(dipxe_text).tif")
     # test_laplace(dir_name, "Fig0338(a)(blurry_moon).tif")
     # test_sobel(dir_name, "Fig0338(a)(blurry_moon).tif")
+
+
+def test_shrink_image(dirname, filename):
+
+    filename = os.path.join(dirname, filename)
+    image = io.imread(filename)
+    fig = plt.figure("Border detection")
+    ax = fig.add_subplot(1, 2, 1)
+    ax.set_title("Original Image")
+    plt.imshow(image, cmap="gray")
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_title("Shrinked Image")
+    shrink = ff.shrink_image(image, 3)
+    plt.imshow(shrink, cmap="gray")
+    plt.show()
+
+
+def test_shrink_average_image(dirname, filename):
+
+    filename = os.path.join(dirname, filename)
+    image = io.imread(filename)
+    fig = plt.figure("Border detection")
+    ax = fig.add_subplot(1, 2, 1)
+    ax.set_title("Original Image")
+    plt.imshow(image, cmap="gray")
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_title("Shrinked Image")
+    shrink = ff.shrink_average_image(image, 3)
+    plt.imshow(shrink, cmap="gray")
+    plt.show()
+
+
+def test_batch_CH04():
+
+    dir_name = "C:\\Users\\MarcosFelipe\\Documents\\PhotoTops\\DIP3E_CH04"
+    test_shrink_image(dir_name, "Fig0417(a)(barbara).tif")
+    test_shrink_average_image(dir_name, "Fig0417(a)(barbara).tif")

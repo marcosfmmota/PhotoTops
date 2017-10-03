@@ -100,14 +100,13 @@ def local_equalization(image):
 
     shape = image.shape
 
-    padded_image = np.zeros((shape[0]+2, shape[1]+2), dtype=np.uint8)
-    # padded_image[-1:1,-1:1] = 255
-    padded_image[1:shape[0]+1, 1:shape[1]+1] = image
-    for i in range(1, shape[0]+1):
-        for j in range(1, shape[1]+1):
+    padded_image = util.pad(image, ((1, 1), (1, 1)), 'constant', constant_values=0)
+
+    for i in range(1, shape[0]+2, 2):
+        for j in range(1, shape[1]+2, 2):
             local_im = padded_image[i-1:i+2, j-1:j+2]
             padded_image[i-1:i+2, j-1:j+2] = histogram_equalization(local_im)
-    equalized_image = padded_image[1:shape[0]+1, 1:shape[1]+1]
+    equalized_image = padded_image[1:shape[0]+2, 1:shape[1]+2]
     return equalized_image
 
 
@@ -117,22 +116,27 @@ def convolve2d(image, kernel):
     n_rows = kernel.shape[0] // 2
     n_cols = kernel.shape[1] // 2
     padded_image = util.pad(image, ((n_rows, n_rows), (n_cols, n_cols)), 'constant', constant_values=0)
+    padded_image = padded_image.astype(np.float)
+    # padded_image = img_as_float(padded_image)
 
     for i in range(n_rows, image.shape[0]+n_rows):
         for j in range(n_cols, image.shape[1]+n_cols):
 
-            # print(padded_image[i,j])
-            # image_array = []
-            conv_pixel = 0
+            # print(padded_image[i, j])
             # print("#")
-            for a in range(-1, 2):
-                for b in range(-1, 2):
-                    # print(padded_image[i+a, j+b])
-                    # print(kernel[a+1,b+1])
-                    conv_pixel += padded_image[i+a, j+b] * kernel[a+1, b+1]
-            # conv_pixel = np.array(np.dot(image_array, mask_array), dtype=int)
+            conv_pixel = 0.0
+            for a in range(-n_rows, n_rows+1):
+                for b in range(-n_cols, n_cols+1):
+                    aux_pix = padded_image[i+a, j+b]
+                    aux_kernel = kernel[a+n_rows, b+n_cols]
+                    conv_pixel += aux_pix * aux_kernel
+
+            # print("*")
+            # print(image_crop)
             # print(conv_pixel)
             padded_image[i, j] = conv_pixel
+            # print(padded_image[i, j])
+
 
     return padded_image[n_rows:image.shape[0]+n_rows, n_cols: image.shape[1] + n_cols]
 
@@ -148,7 +152,11 @@ def add_two_images(image1, image2):
         for i in range(image1.shape[0]):
             for j in range(image1.shape[1]):
 
-                sum_image[i, j] = image1[i, j] + image2[i, j]
+                sum_pixel = int(image1[i, j]) + int(image2[i, j])
+                if sum_pixel > 255:
+                    sum_image[i, j] = 255
+                else:
+                    sum_image[i, j] = image1[i, j] + image2[i, j]
 
         return sum_image
 
@@ -167,7 +175,11 @@ def subtract_two_images(image1, image2):
         for i in range(image1.shape[0]):
             for j in range(image1.shape[1]):
 
-                sub_image[i, j] = image1[i, j] - image2[i, j]
+                sub_pixel = int(image1[i, j]) - int(image2[i, j])
+                if sub_pixel < 0:
+                    sub_image[i, j] = 0
+                else:
+                    sub_image[i, j] = image1[i, j] - image2[i, j]
 
         return sub_image
 
@@ -185,10 +197,9 @@ def convolve_average(image, kernel):
     return average_im
 
 
-def convolve_percentil(image, kernel, percentil):
+def convolve_percentil(image, kernel):
 
-    per_func = lambda a, p: np.sort(a)[int(a.size*p)]
-
+    per_func = lambda a: np.sort(a)[a.size//2]
     new_rows = kernel.shape[0] - 1
     new_columns = kernel.shape[1] - 1
     # number of rows and columns from the center of the mask
@@ -203,7 +214,7 @@ def convolve_percentil(image, kernel, percentil):
 
             image_crop = padded_image[i - n_middle_r: i + n_middle_r + 1, j - n_middle_c: j + n_middle_c + 1]
             image_crop_array = np.reshape(image_crop, image_crop.size)
-            convoluted_pixel = per_func(image_crop_array, percentil)
+            convoluted_pixel = per_func(image_crop_array)
             padded_image[i, j] = convoluted_pixel
 
     conv_image = padded_image[n_middle_r: image.shape[0] + n_middle_r, n_middle_c: image.shape[1] + n_middle_c]
@@ -214,15 +225,15 @@ def convolve_percentil(image, kernel, percentil):
 def convolve_laplace(image):
 
     laplace = np.array([
-        [0, -1, 0],
-        [-1, 4, -1],
-        [0, -1, 0]
-    ], dtype=float)
+        [0, 1, 0],
+        [1, -4, 1],
+        [0, 1, 0]
+    ])
 
     im_laplace = convolve2d(image, laplace)
     # im_laplace = filters.laplace(image)
     # np.set_printoptions(suppress=True)
-    # im_laplace = exposure.rescale_intensity(im_laplace, in_range=(0, 255))
+    # im_laplace = exposure.rescale_intensity(im_laplace, out_range=np.uint8)
     # for i in im_laplace:
     #     print(i)
     # im_laplace = add_two_images(image, im_laplace)
@@ -235,10 +246,11 @@ def convolve_sobel(image):
         [-1, -2, -1],
         [0, 0, 0],
         [1, 2, 1]
-    ])
+    ], dtype=np.float)
+    image = image.astype(np.float)
 
     im_sobel = convolve2d(image, sobel_x)
-    # im_sobel = exposure.rescale_intensity(im_sobel, out_range=(0, 2 ** 8 - 1))
+    im_sobel = exposure.rescale_intensity(im_sobel, out_range=np.uint8)
     # im_sobel = filters.sobel(image)
 
     return im_sobel
@@ -249,14 +261,10 @@ def highboost_filter(original_image):
         [1, 1, 1],
         [1, 1, 1],
         [1, 1, 1],
-
     ], dtype=float)
-
-    original_image = img_as_float(original_image)
 
     blured_image = convolve_average(original_image, kernel)
     mask = subtract_two_images(original_image, blured_image)
     highboost_image = add_two_images(original_image, mask)
-    highboost_image = exposure.rescale_intensity(highboost_image, out_range=np.uint8)
 
     return highboost_image
