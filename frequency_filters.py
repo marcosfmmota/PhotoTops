@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import spatial_filters as sf
+from skimage.util import img_as_float
 
 
 def shrink_image(image, rate):
@@ -24,3 +25,7 @@ def shrink_average_image(image, rate):
     shrinked = shrink_image(average_image, rate)
 
     return shrinked
+
+def compute_spectrum(image):
+
+    image = img_as_float(image)

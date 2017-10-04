@@ -3,9 +3,8 @@ import math
 import numpy as np
 from skimage import img_as_float
 from skimage import img_as_ubyte
-from skimage import img_as_int
-from skimage import exposure
 from skimage import util
+from skimage import exposure
 
 def negative(image):
     for i in range(image.shape[0]):
@@ -116,12 +115,9 @@ def convolve2d(image, kernel):
     n_rows = kernel.shape[0] // 2
     n_cols = kernel.shape[1] // 2
     padded_image = util.pad(image, ((n_rows, n_rows), (n_cols, n_cols)), 'constant', constant_values=0)
-    padded_image = padded_image.astype(np.float)
-    # padded_image = img_as_float(padded_image)
 
     for i in range(n_rows, image.shape[0]+n_rows):
         for j in range(n_cols, image.shape[1]+n_cols):
-
             # print(padded_image[i, j])
             # print("#")
             conv_pixel = 0.0
@@ -134,16 +130,17 @@ def convolve2d(image, kernel):
             # print("*")
             # print(image_crop)
             # print(conv_pixel)
-            padded_image[i, j] = conv_pixel
-            # print(padded_image[i, j])
+            # padded_image[i, j] = conv_pixel
+            image[i - n_rows, j - n_cols] = conv_pixel
+            # print(image[i - n_rows, j - n_cols])
 
-
-    return padded_image[n_rows:image.shape[0]+n_rows, n_cols: image.shape[1] + n_cols]
+    # return padded_image[n_rows:image.shape[0]+n_rows, n_cols: image.shape[1] + n_cols]
+    return image
 
 
 def add_two_images(image1, image2):
 
-    sum_image = np.zeros(image1.shape)
+    sum_image = np.zeros_like(image1)
 
     try:
         if image1.size != image2.size:
@@ -152,7 +149,7 @@ def add_two_images(image1, image2):
         for i in range(image1.shape[0]):
             for j in range(image1.shape[1]):
 
-                sum_pixel = int(image1[i, j]) + int(image2[i, j])
+                sum_pixel = image1[i, j] + image2[i, j]
                 if sum_pixel > 255:
                     sum_image[i, j] = 255
                 else:
@@ -166,7 +163,7 @@ def add_two_images(image1, image2):
 
 def subtract_two_images(image1, image2):
 
-    sub_image = np.zeros(image1.shape)
+    sub_image = np.empty_like(image1)
 
     try:
         if image1.size != image2.size:
@@ -175,7 +172,7 @@ def subtract_two_images(image1, image2):
         for i in range(image1.shape[0]):
             for j in range(image1.shape[1]):
 
-                sub_pixel = int(image1[i, j]) - int(image2[i, j])
+                sub_pixel = image1[i, j] - image2[i, j]
                 if sub_pixel < 0:
                     sub_image[i, j] = 0
                 else:
@@ -197,7 +194,7 @@ def convolve_average(image, kernel):
     return average_im
 
 
-def convolve_percentil(image, kernel):
+def convolve_median(image, kernel):
 
     per_func = lambda a: np.sort(a)[a.size//2]
     new_rows = kernel.shape[0] - 1
@@ -228,32 +225,54 @@ def convolve_laplace(image):
         [0, 1, 0],
         [1, -4, 1],
         [0, 1, 0]
-    ])
+    ], dtype=np.float)
+    image_laplace = image.astype(np.float)
 
-    im_laplace = convolve2d(image, laplace)
-    # im_laplace = filters.laplace(image)
-    # np.set_printoptions(suppress=True)
-    # im_laplace = exposure.rescale_intensity(im_laplace, out_range=np.uint8)
-    # for i in im_laplace:
-    #     print(i)
-    # im_laplace = add_two_images(image, im_laplace)
-    return im_laplace
+    convolve2d(image_laplace, laplace)
+
+    return image_laplace
 
 
-def convolve_sobel(image):
+def convolve_sobel_x(image):
 
     sobel_x = np.array([
         [-1, -2, -1],
         [0, 0, 0],
         [1, 2, 1]
     ], dtype=np.float)
-    image = image.astype(np.float)
+    im_sobel_x = image.astype(np.float)
 
-    im_sobel = convolve2d(image, sobel_x)
-    im_sobel = exposure.rescale_intensity(im_sobel, out_range=np.uint8)
-    # im_sobel = filters.sobel(image)
+    convolve2d(im_sobel_x, sobel_x)
 
-    return im_sobel
+    return im_sobel_x
+
+
+def convolve_sobel_y(image):
+    sobel_y = np.array([
+        [-1, 0, 1],
+        [-2, 0, 2],
+        [-1, 0, 1]
+    ], dtype=np.float)
+    im_sobel_y = image.astype(np.float)
+
+    convolve2d(im_sobel_y, sobel_y)
+
+    return im_sobel_y
+
+
+def enhance_borders_sobel(image):
+
+    image_float = image.astype(np.float)
+
+    borders_x = convolve_sobel_x(image_float)
+    borders_y = convolve_sobel_y(image_float)
+
+    enhanced_x = add_two_images(image.astype(np.float), borders_x)
+    enhanced_y = add_two_images(image.astype(np.float), borders_y)
+
+    final_image = add_two_images(enhanced_x, enhanced_y)
+    return final_image
+
 
 def highboost_filter(original_image):
 
@@ -263,8 +282,9 @@ def highboost_filter(original_image):
         [1, 1, 1],
     ], dtype=float)
 
-    blured_image = convolve_average(original_image, kernel)
-    mask = subtract_two_images(original_image, blured_image)
+    float_image = original_image.astype(np.float)
+    blured_image = convolve_average(float_image, kernel)
+    mask = subtract_two_images(original_image.astype(np.float), blured_image)
     highboost_image = add_two_images(original_image, mask)
 
     return highboost_image
