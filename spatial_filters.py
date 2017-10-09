@@ -101,12 +101,27 @@ def local_equalization(image):
 
     padded_image = util.pad(image, ((1, 1), (1, 1)), 'constant', constant_values=0)
 
-    for i in range(1, shape[0]+2, 2):
-        for j in range(1, shape[1]+2, 2):
-            local_im = padded_image[i-1:i+2, j-1:j+2]
-            padded_image[i-1:i+2, j-1:j+2] = histogram_equalization(local_im)
-    equalized_image = padded_image[1:shape[0]+2, 1:shape[1]+2]
-    return equalized_image
+    for i in range(1, shape[0] + 1):
+        for j in range(1, shape[1] + 1):
+
+            grid_image = padded_image[i-1:i+2, j-1:j+2]
+
+            trans_func = histogram(grid_image)
+            acum = 0
+            mn = grid_image.size
+
+            for x in range(len(trans_func)):
+                acum += trans_func[x]
+                trans_func[x] = (255 / mn) * acum
+
+            trans_func = np.round(trans_func)
+
+            # for i in range(image.shape[0]):
+            #     for j in range(image.shape[1]):
+            # print(trans_func[image[i-1, j-1]])
+            image[i-1, j-1] = trans_func[image[i-1, j-1]]
+
+    return image
 
 
 def convolve2d(image, kernel):
@@ -172,7 +187,7 @@ def subtract_two_images(image1, image2):
         for i in range(image1.shape[0]):
             for j in range(image1.shape[1]):
 
-                sub_pixel = image1[i, j] - image2[i, j]
+                sub_pixel = (image1[i, j] - image2[i, j])
                 if sub_pixel < 0:
                     sub_image[i, j] = 0
                 else:
