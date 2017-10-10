@@ -115,9 +115,40 @@ def test_alpha_trimmed(dir_name, filename):
     plt.imshow(image, cmap="gray")
     ax = fig.add_subplot(1, 2, 2)
     ax.set_title("Alpha Image")
-    shrink = rf.alpha_trimmed_filter(image.astype(np.float), (5, 5), 5)
+    shrink = rf.alpha_trimmed_filter(image.astype(np.float), 5, (5, 5))
     plt.imshow(shrink, cmap="gray")
     plt.show()
+
+
+def test_mean_adaptive(dir_name, filename):
+
+    filename = os.path.join(dir_name, filename)
+    image = io.imread(filename)
+    fig = plt.figure("Restoration")
+    ax = fig.add_subplot(1, 2, 1)
+    ax.set_title("Original Image")
+    plt.imshow(image, cmap="gray")
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_title("Alpha Image")
+    shrink = rf.mean_adaptive_filter(image.astype(np.float), 1000, (7, 7))
+    plt.imshow(shrink, cmap="gray")
+    plt.show()
+
+
+def test_median_adaptive(dir_name, filename):
+
+    filename = os.path.join(dir_name, filename)
+    image = io.imread(filename)
+    fig = plt.figure("Restoration")
+    ax = fig.add_subplot(1, 2, 1)
+    ax.set_title("Original Image")
+    plt.imshow(image, cmap="gray")
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_title("Median Adaptive Image")
+    shrink = rf.median_adaptive_filter(image.astype(np.float), (7, 7))
+    plt.imshow(shrink, cmap="gray")
+    plt.show()
+
 
 def test_batch_CH05():
 
@@ -127,7 +158,9 @@ def test_batch_CH05():
     # test_harmonic_mean(dir_name, "Fig0508(b)(circuit-board-salt-prob-pt1).tif")
     # test_contraharmonic_mean(dir_name, "Fig0508(a)(circuit-board-pepper-prob-pt1).tif",
     #                          "Fig0508(b)(circuit-board-salt-prob-pt1).tif")
-    test_max(dir_name, "Fig0508(a)(circuit-board-pepper-prob-pt1).tif")
-    test_min(dir_name, "Fig0508(b)(circuit-board-salt-prob-pt1).tif")
-    test_alpha_trimmed(dir_name, "Fig0512(a)(ckt-uniform-var-800).tif")
+    # test_max(dir_name, "Fig0508(a)(circuit-board-pepper-prob-pt1).tif")
+    # test_min(dir_name, "Fig0508(b)(circuit-board-salt-prob-pt1).tif")
+    # test_alpha_trimmed(dir_name, "Fig0512(a)(ckt-uniform-var-800).tif")
+    # test_mean_adaptive(dir_name, "Fig0513(a)(ckt_gaussian_var_1000_mean_0).tif")
+    test_median_adaptive(dir_name, "Fig0514(a)(ckt_saltpep_prob_pt25).tif")
 
