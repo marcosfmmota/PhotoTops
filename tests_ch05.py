@@ -129,7 +129,7 @@ def test_mean_adaptive(dir_name, filename):
     ax.set_title("Original Image")
     plt.imshow(image, cmap="gray")
     ax = fig.add_subplot(1, 2, 2)
-    ax.set_title("Alpha Image")
+    ax.set_title("Mean Adaptive Image")
     shrink = rf.mean_adaptive_filter(image.astype(np.float), 1000, (7, 7))
     plt.imshow(shrink, cmap="gray")
     plt.show()

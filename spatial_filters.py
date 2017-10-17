@@ -164,7 +164,7 @@ def add_two_images(image1, image2):
         for i in range(image1.shape[0]):
             for j in range(image1.shape[1]):
 
-                sum_pixel = image1[i, j] + image2[i, j]
+                sum_pixel = (image1[i, j] + image2[i, j]) / 2.0
                 if sum_pixel > 255:
                     sum_image[i, j] = 255
                 else:
@@ -187,7 +187,7 @@ def subtract_two_images(image1, image2):
         for i in range(image1.shape[0]):
             for j in range(image1.shape[1]):
 
-                sub_pixel = (image1[i, j] - image2[i, j])
+                sub_pixel = (image1[i, j] - image2[i, j]) / 2.0
                 if sub_pixel < 0:
                     sub_image[i, j] = 0
                 else:

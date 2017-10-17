@@ -33,7 +33,7 @@ def geometric_mean_filter(image, size=(3, 3)):
     return image
 
 
-def harmonic_mean_filter(image, size=(3,3)):
+def harmonic_mean_filter(image, size=(3, 3)):
 
     kernel = np.ones(size)
     mn = size[0]*size[1]
@@ -54,10 +54,9 @@ def harmonic_mean_filter(image, size=(3,3)):
     return image
 
 
-def contraharmonic_mean_filter(image, size=(3,3), order=0):
+def contraharmonic_mean_filter(image, size=(3, 3), order=0):
 
     kernel = np.ones(size)
-    mn = size[0]*size[1]
     n_rows = kernel.shape[0] // 2
     n_cols = kernel.shape[1] // 2
     padded_image = util.pad(image, ((n_rows, n_rows), (n_cols, n_cols)), 'constant', constant_values=0)
@@ -81,7 +80,7 @@ def contraharmonic_mean_filter(image, size=(3,3), order=0):
     return image
 
 
-def median_filter(image, size=(3,3)):
+def median_filter(image, size=(3, 3)):
 
     kernel = np.ones(size)
     image = sf.convolve_median(image, kernel)
@@ -150,7 +149,7 @@ def alpha_trimmed_filter(image, d=0, size=(3, 3)):
     return image
 
 
-def mean_adaptive_filter(image, variance, size=(3,3)):
+def mean_adaptive_filter(image, variance, size=(3, 3)):
 
     kernel = np.ones(size)
     mn = size[0]*size[1]
@@ -165,6 +164,7 @@ def mean_adaptive_filter(image, variance, size=(3,3)):
             crop = np.reshape(crop, mn)
             variance_local = crop.var()
             mean_local = crop.mean()
+            # print(variance_local)
             pixel = image[i - n_rows, j - n_cols]
             image[i - n_rows, j - n_cols] = pixel - ((variance/variance_local)*(pixel - mean_local))
 

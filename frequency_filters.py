@@ -76,3 +76,4 @@ def general_frequency_filter(image, func):
     image_filtered = spectrum[:image.shape[0], :image.shape[1]]
 
     return image_filtered
+
