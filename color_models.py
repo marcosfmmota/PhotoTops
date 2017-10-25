@@ -48,24 +48,21 @@ def rgb_to_hsi(image):
 
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
-            r = image[i, j, 0]
-            g = image[i, j, 1]
-            b = image[i, j, 2]
+            r, g, b = image[i, j, :]
             # epsilon to avoid a division by zero
-            ep = 0.001
+            ep = 0.0001
             intensity = (r + g + b) / 3.0
-            saturation = 1 - ((3 / (r + g + b)) * np.min(image[i, j, :]))
+            saturation = 1 - ((3 * min([r, g, b])) / (r + g + b))
             rmg = r - g
             rmb = r - b
             gmb = g - b
             w = ((rmg + rmb) * 0.5) / (math.sqrt((rmg**2) + (rmb*gmb)) + ep)
-
-            theta = math.acos(w)
+            hue = math.acos(w)/(math.pi*2)
 
             if b > g:
-                theta = (2 * math.pi) - theta
-
-            hsi = np.array([theta, saturation, intensity])
+                hue = 1 - (hue/(math.pi*2))
+            # print(theta)
+            hsi = np.array([hue, saturation, intensity])
 
             # print(hsi)
 
@@ -76,39 +73,38 @@ def rgb_to_hsi(image):
 
 def hsi_to_rgb(image):
 
-    image = img_as_float(image)
-
     rgb_image = np.zeros(image.shape)
 
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
 
-            h = image[i, j, 0] * 360
-            s = image[i, j, 1]
-            i =image[i, j, 2]
-            if 0 <= h < 120:
+            hue = image[i, j, 0] * (math.pi * 2)
+            sat = image[i, j, 1]
+            intens = image[i, j, 2]
 
-                b = i*(1 - s)
-                r = i*(1 + ((s * math.cos(h)) / math.cos(60 - h)))
-                g = 3*i - (r + b)
+            if 0 <= hue < math.radians(120):
+
+                b = intens*(1 - sat)
+                r = intens*(1 + ((sat * math.cos(hue)) / math.cos(math.radians(60) - hue)))
+                g = (3 * intens) - (r + b)
                 rgb = np.array([r, g, b])
                 rgb_image[i, j, :] = rgb
 
-            elif 120 <= h < 240:
-                h -= 120
-                r = i * (1 - s)
-                g = i * (1 + ((s * math.cos(h)) / math.cos(60 - h)))
-                b = 3 * i - (r + g)
+            elif math.radians(120) <= hue < math.radians(240):
+                hue -= math.radians(120)
+                r = intens * (1 - sat)
+                g = intens * (1 + ((sat * math.cos(hue)) / math.cos(math.radians(60) - hue)))
+                b = (3 * intens) - (r + g)
                 rgb = np.array([r, g, b])
                 rgb_image[i, j, :] = rgb
 
             else:
-                h -= 240
-                g = i * (1 - s)
-                b = i * (1 + ((s * math.cos(h)) / math.cos(60 - h)))
-                r = 3 * i - (g + b)
+                hue -= math.radians(240)
+                g = intens * (1 - sat)
+                b = intens * (1 + ((sat * math.cos(hue)) / math.cos(math.radians(60) - hue)))
+                r = (3 * intens) - (g + b)
                 rgb = np.array([r, g, b])
                 rgb_image[i, j, :] = rgb
+                # print(rgb)
 
-    rgb_image = img_as_ubyte(rgb_image)
     return rgb_image
