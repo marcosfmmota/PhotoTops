@@ -50,17 +50,17 @@ def rgb_to_hsi(image):
         for j in range(image.shape[1]):
             r, g, b = image[i, j, :]
             # epsilon to avoid a division by zero
-            ep = 0.0001
+            ep = 0.000001
             intensity = (r + g + b) / 3.0
             saturation = 1 - ((3 * min([r, g, b])) / (r + g + b))
             rmg = r - g
             rmb = r - b
             gmb = g - b
-            w = ((rmg + rmb) * 0.5) / (math.sqrt((rmg**2) + (rmb*gmb)) + ep)
-            hue = math.acos(w)/(math.pi*2)
+            w = ((rmg + rmb) * 0.5) / (math.sqrt((rmg ** 2) + (rmb * gmb)) + ep)
+            hue = math.acos(w)/(2*math.pi)
 
             if b > g:
-                hue = 1 - (hue/(math.pi*2))
+                hue = 1 - (hue/(2*math.pi))
             # print(theta)
             hsi = np.array([hue, saturation, intensity])
 
@@ -78,7 +78,7 @@ def hsi_to_rgb(image):
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
 
-            hue = image[i, j, 0] * (math.pi * 2)
+            hue = image[i, j, 0] * (2*math.pi)
             sat = image[i, j, 1]
             intens = image[i, j, 2]
 
