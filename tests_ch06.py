@@ -4,8 +4,10 @@ import color_models as cm
 import color_filters as cf
 from skimage.color import hsv2rgb
 from skimage.color import rgb2hsv
+from skimage.util import img_as_float
 import spatial_filters as sf
 import numpy as np
+import math
 
 
 def test_color_models(image):
@@ -51,8 +53,34 @@ def test_average_filter(image):
     plt.show()
 
 
+def test_tone_filter_rgb(image):
+    fig = plt.figure("Color Model")
+    ax = fig.add_subplot(1, 2, 1)
+    ax.set_title("Original Image")
+    plt.imshow(image)
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_title("Modified Image")
+    hsi_image = cf.tone_filter_rgb(img_as_float(image), lambda x: math.pow(x, 1.25))
+    plt.imshow(hsi_image, cmap='hsv')
+    plt.show()
+
+
+def test_sepia(image):
+
+    fig = plt.figure("Color Model")
+    ax = fig.add_subplot(1, 2, 1)
+    ax.set_title("Original Image")
+    plt.imshow(image)
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_title("Modified Image")
+    hsi_image = cf.sepia_filter(img_as_float(image))
+    plt.imshow(hsi_image, cmap='gray')
+    plt.show()
+
 def test_batch_CH06():
     image = io.imread("dog.jpg")
     # test_color_models(image)
     # test_brightness(image)
-    test_average_filter(image)
+    # test_average_filter(image)
+    #test_tone_filter_rgb(image)
+    test_sepia(image)

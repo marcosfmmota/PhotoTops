@@ -2,29 +2,7 @@ from skimage.color import hsv2rgb
 from skimage.color import rgb2hsv
 import spatial_filters as sf
 import numpy as np
-
-
-def subtract_two_images(image1, image2):
-
-    sub_image = np.empty_like(image1)
-
-    try:
-        if image1.size != image2.size:
-            raise NameError()
-
-        for i in range(image1.shape[0]):
-            for j in range(image1.shape[1]):
-
-                sub_pixel = (image1[i, j, :] - image2[i, j, :])
-                if sub_pixel.any() < 0:
-                    sub_image[i, j, :] = np.zeros(3)
-                else:
-                    sub_image[i, j, :] = sub_pixel
-
-        return sub_image
-
-    except NameError:
-        print("Images don't have the same size")
+from skimage.color import rgb2gray
 
 
 def brightness_filter(image, percent):
@@ -66,3 +44,30 @@ def average_filter_hsi(image, shape=(3,3)):
     avg_image[:, :, 2] = i_component
 
     return avg_image
+
+
+def tone_filter_rgb(image, func):
+
+    tone_image = np.empty_like(image)
+    vfunc = np.vectorize(func)
+    r_component = vfunc(image[:, :, 0])
+    g_component = vfunc(image[:, :, 1])
+    b_component = vfunc(image[:, :, 2])
+
+    tone_image[:, :, 0] = r_component
+    tone_image[:, :, 1] = g_component
+    tone_image[:, :, 2] = b_component
+
+    return tone_image
+
+
+def sepia_filter(image, c1=1.8, c2=1.4):
+
+    image[:, :, 2] = image.sum(axis=2) / 3
+    image[:, :, 0] = c1 * image[:, :, 2]
+    mask = image[:, :, 0] > 1
+    image[:, :, 0][mask] = 1
+    image[:, :, 1] = c2 * image[:, :, 2]
+    mask = image[:, :, 1] > 1
+    image[:, :, 1][mask] = 1
+    return image
