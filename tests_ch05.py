@@ -1,9 +1,11 @@
 # tests of restoration techniques in the samples images of chapter 05
-from skimage import io
 import os
+
 import matplotlib.pyplot as plt
-import restoration_filters as rf
 import numpy as np
+from skimage import io
+
+import restoration_filters as rf
 
 
 def test_arithmetic_mean(dir_name, filename):

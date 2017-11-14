@@ -1,10 +1,10 @@
-#color_models.py
+# color_models.py
+
+import math
 
 import numpy as np
 from skimage.util import img_as_float
 from skimage.util import img_as_ubyte
-from skimage.color import hsv2rgb
-import math
 
 
 def rgb_to_grayscale(image):

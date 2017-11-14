@@ -4,7 +4,7 @@ import numpy as np
 from skimage import img_as_float
 from skimage import img_as_ubyte
 from skimage import util
-from skimage import exposure
+
 
 def negative(image):
     for i in range(image.shape[0]):

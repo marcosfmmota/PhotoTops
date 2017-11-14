@@ -1,8 +1,10 @@
-import matplotlib.pyplot as plt
-import os
-from skimage import io
-import frequency_filters as ff
 import math
+import os
+
+import matplotlib.pyplot as plt
+from skimage import io
+
+import frequency_filters as ff
 
 
 def test_shrink_image(dirname, filename):

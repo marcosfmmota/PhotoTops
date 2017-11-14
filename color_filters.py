@@ -1,12 +1,10 @@
+import numpy as np
 from skimage.color import hsv2rgb
 from skimage.color import rgb2hsv
-from skimage.util import img_as_ubyte
-from skimage.util import img_as_float
 from skimage.exposure import equalize_hist
+
 import spatial_filters as sf
-import numpy as np
-from skimage.color import rgb2gray
-import color_models as cm
+
 
 def brightness_filter(image, percent):
 

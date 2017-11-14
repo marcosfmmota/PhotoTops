@@ -1,13 +1,13 @@
-from skimage import io
+import math
+
 from matplotlib import pyplot as plt
-import color_models as cm
-import color_filters as cf
+from skimage import io
 from skimage.color import hsv2rgb
 from skimage.color import rgb2hsv
 from skimage.util import img_as_float
-import spatial_filters as sf
-import numpy as np
-import math
+
+import color_filters as cf
+import color_models as cm
 
 
 def test_color_models(image):

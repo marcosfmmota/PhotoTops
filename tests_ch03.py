@@ -1,7 +1,9 @@
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 from skimage import io
+
 import spatial_filters as sf
 
 

@@ -1,9 +1,10 @@
 import math
+
 import numpy as np
-import spatial_filters as sf
 from skimage.util import pad
-from scipy.spatial import distance
-import math
+
+import spatial_filters as sf
+
 
 def shrink_image(image, rate):
 
