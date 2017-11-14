@@ -1,9 +1,12 @@
 from skimage.color import hsv2rgb
 from skimage.color import rgb2hsv
+from skimage.util import img_as_ubyte
+from skimage.util import img_as_float
+from skimage.exposure import equalize_hist
 import spatial_filters as sf
 import numpy as np
 from skimage.color import rgb2gray
-
+import color_models as cm
 
 def brightness_filter(image, percent):
 
@@ -18,7 +21,7 @@ def brightness_filter(image, percent):
     return hsv2rgb(image_hsv)
 
 
-def average_filter_rgb(image, shape=(3, 3)):
+def average_filter_rgb(image, shape=(5, 5)):
 
     kernel = np.ones(shape)
     avg_image = np.empty_like(image)
@@ -33,7 +36,7 @@ def average_filter_rgb(image, shape=(3, 3)):
     return avg_image
 
 
-def average_filter_hsi(image, shape=(3,3)):
+def average_filter_hsi(image, shape=(5, 5)):
 
     kernel = np.ones(shape)
     avg_image = np.empty_like(image)
@@ -61,7 +64,15 @@ def tone_filter_rgb(image, func):
     return tone_image
 
 
-def sepia_filter(image, c1=1.8, c2=1.4):
+def tone_filter_hsi(image, func):
+
+    vfunc = np.vectorize(func)
+    image[:, :, 2] = vfunc(image[:, :, 2])
+
+    return image
+
+
+def sepia_filter(image, c1=1.7, c2=1.3):
 
     image[:, :, 2] = image.sum(axis=2) / 3
     image[:, :, 0] = c1 * image[:, :, 2]
@@ -71,3 +82,23 @@ def sepia_filter(image, c1=1.8, c2=1.4):
     mask = image[:, :, 1] > 1
     image[:, :, 1][mask] = 1
     return image
+
+
+def image_equalization(image):
+    image = rgb2hsv(image)
+    image[:, :, 2] = equalize_hist(image[:, :, 2])
+    image = tone_filter_hsi(image, lambda x: x**0.93)
+    image = hsv2rgb(image)
+    return image
+
+
+def chroma_key(image1, image2, radius=0.7, alpha=0.0):
+    green = np.ones(image1.shape)
+    green[:, :, :] = np.array([0.0, 1.0, 0.0])
+    mask = ((image1 - green)**2).sum(axis=2) < radius ** 2
+    for i in range(3):
+        image1[:, :, i][mask] = image2[:, :, i][mask]
+        image1[:, :, i][np.logical_not(mask)] += image2[:, :, i][np.logical_not(mask)]*alpha
+
+    return image1
+

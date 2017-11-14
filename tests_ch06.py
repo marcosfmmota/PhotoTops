@@ -77,10 +77,32 @@ def test_sepia(image):
     plt.imshow(hsi_image, cmap='gray')
     plt.show()
 
+
+def test_histogram(image):
+
+    fig = plt.figure("Color Model")
+    ax = fig.add_subplot(1, 2, 1)
+    ax.set_title("Original Image")
+    plt.imshow(image)
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_title("Modified Image")
+    hsi_image = cf.image_equalization(image)
+    plt.imshow(hsi_image, cmap='gray')
+    plt.show()
+
+def test_chroma_key(image1, image2):
+    chroma = cf.chroma_key(img_as_float(image1), img_as_float(image2))
+    plt.imshow(chroma, cmap="gray")
+    plt.show()
+
 def test_batch_CH06():
     image = io.imread("dog.jpg")
     # test_color_models(image)
     # test_brightness(image)
     # test_average_filter(image)
-    #test_tone_filter_rgb(image)
-    test_sepia(image)
+    # test_tone_filter_rgb(image)
+    # test_sepia(image)
+    test_histogram(image)
+    donald = io.imread("donald.jpg")
+    back = io.imread("back.jpg")
+    test_chroma_key(donald, back)
