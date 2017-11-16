@@ -8,6 +8,9 @@ from skimage.util import img_as_float
 
 import color_filters as cf
 import color_models as cm
+import wavelets_transforms as wt
+
+import numpy as np
 
 
 def test_color_models(image):
@@ -102,7 +105,16 @@ def test_batch_CH06():
     # test_average_filter(image)
     # test_tone_filter_rgb(image)
     # test_sepia(image)
-    test_histogram(image)
-    donald = io.imread("donald.jpg")
-    back = io.imread("back.jpg")
-    test_chroma_key(donald, back)
+    # test_histogram(image)
+    # donald = io.imread("donald.jpg")
+    # back = io.imread("back.jpg")
+    # test_chroma_key(donald, back)
+    x = np.array([6, 12, 15, 15, 14, 12, 120, 116])
+    print(wt.haar1d(x))
+    print(wt.haar1d_inverse(wt.haar1d(x)))
+    lena = io.imread("lena.bmp")
+    print(lena.shape)
+    t_lena = wt.haar_image(img_as_float(lena))
+    t_lena = wt.haar_inverse_image(t_lena)
+    plt.imshow(t_lena, cmap="gray")
+    plt.show()
