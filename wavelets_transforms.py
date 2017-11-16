@@ -34,35 +34,28 @@ def haar1d_inverse(array):
     return temp
 
 
-def haar2d(image, levels=1):
+def haar2d(image):
 
     rows, cols = image.shape
 
-    for k in range(levels):
-        lev = 2 ** k
-
-        lev_rows = rows // lev
-        lev_cols = cols // lev
-        for i in range(lev_rows):
+    for i in range(rows):
             image[i, :] = haar1d(image[i, :])
 
-        for j in range(lev_cols):
+    for j in range(cols):
             image[:, j] = haar1d(image[:, j])
 
     return image
 
 
-def haar2d_inverse(image, levels=1):
+def haar2d_inverse(image):
 
     rows, cols = image.shape
 
-    for k in range(levels, 0, -1):
+    for j in range(cols):
+        image[:, j] = haar1d_inverse(image[:, j])
 
-        for j in range(cols):
-            image[:, j] = haar1d_inverse(image[:, j])
-
-        for i in range(rows):
-            image[i, :] = haar1d_inverse(image[i, :])
+    for i in range(rows):
+        image[i, :] = haar1d_inverse(image[i, :])
 
     return image
 
@@ -71,13 +64,18 @@ def haar_image(image, level=1):
 
     t_image = np.empty_like(image)
 
-    r_comp = haar2d(image[:, :, 0], level)
-    g_comp = haar2d(image[:, :, 1], level)
-    b_comp = haar2d(image[:, :, 2], level)
+    for i in range(level):
+        rows, cols, _ = image.shape
+        rows //= 1 + i
+        cols //= 1 + i
 
-    t_image[:, :, 0] = r_comp
-    t_image[:, :, 1] = g_comp
-    t_image[:, :, 2] = b_comp
+        r_comp = haar2d(image[:rows, :cols, 0])
+        g_comp = haar2d(image[:rows, :cols, 1])
+        b_comp = haar2d(image[:rows, :cols, 2])
+
+        t_image[:rows, :cols, 0] = r_comp
+        t_image[:rows, :cols, 1] = g_comp
+        t_image[:rows, :cols, 2] = b_comp
 
     return t_image
 
@@ -86,12 +84,17 @@ def haar_inverse_image(image, level=1):
 
     t_image = np.empty_like(image)
 
-    r_comp = haar2d_inverse(image[:, :, 0], level)
-    g_comp = haar2d_inverse(image[:, :, 1], level)
-    b_comp = haar2d_inverse(image[:, :, 2], level)
+    for i in range(level, 0, -1):
+        rows, cols, _ = image.shape
+        rows = rows // i
+        cols = cols // i
 
-    t_image[:, :, 0] = r_comp
-    t_image[:, :, 1] = g_comp
-    t_image[:, :, 2] = b_comp
+        r_comp = haar2d_inverse(image[:rows, :cols, 0])
+        g_comp = haar2d_inverse(image[:rows, :cols, 1])
+        b_comp = haar2d_inverse(image[:rows, :cols, 2])
+
+        t_image[:rows, :cols, 0] = r_comp
+        t_image[:rows, :cols, 1] = g_comp
+        t_image[:rows, :cols, 2] = b_comp
 
     return t_image
