@@ -5,6 +5,8 @@ from skimage import io
 from skimage.color import hsv2rgb
 from skimage.color import rgb2hsv
 from skimage.util import img_as_float
+from skimage import exposure
+from tempfile import TemporaryFile
 
 import color_filters as cf
 import color_models as cm
@@ -110,9 +112,11 @@ def test_batch_CH06():
     # back = io.imread("back.jpg")
     # test_chroma_key(donald, back)
     lena = io.imread("lena.bmp")
-    t_lena = wt.haar_image(img_as_float(lena), level=4)
-    plt.imshow(t_lena, cmap="gray")
+    t_lena = wt.haar_image(img_as_float(lena), level=5)
+    t_lena_n = exposure.rescale_intensity(t_lena, in_range=(0, 1))
+    plt.imshow(t_lena_n, cmap="gray")
     plt.show()
-    t_lena = wt.haar_inverse_image(t_lena, level=4)
+    t_lena = wt.haar_inverse_image(t_lena, level=5)
+    t_lena = exposure.rescale_intensity(t_lena, in_range=(0, 1))
     plt.imshow(t_lena, cmap="gray")
     plt.show()
