@@ -7,9 +7,9 @@ def write_as_mcf(ndarray, filename):
     file.write(ndarray.tobytes())
 
 
-def read_as_np(filename: np.ndarray, shape: int):
+def read_as_np(filename: np.ndarray):
 
-    nparray = np.fromfile(filename + ".mcf", dtype=np.uint8).reshape(shape)
+    nparray = np.fromfile(filename + ".mcf", dtype=np.uint8)
     return nparray
 
 
@@ -61,12 +61,51 @@ def lzw_decompress(vec: np.ndarray):
     return np.array(result)
 
 
-def run_length(image: np.ndarray):
-
-    img_vec = image.reshape(image.size)
-
-    run = np.empty_like(img_vec)
+def run_length(vec: np.ndarray):
 
 
-# def compress(image):
+    run = []
+    i = 0
+    while i < vec.size:
+        count = 0
+        for j in range(i, vec.size):
+            if vec[i] == vec[j]:
+                count += 1
+            else:
+                break
 
+        run += [count, vec[i]]
+        i += count
+
+    return np.array(run)
+
+
+def run_length_inv(run: np.ndarray):
+
+    vec = []
+
+    for i in range(0, run.size, 2):
+        for j in range(run[i]):
+            vec += [run[i+1]]
+
+    return np.array(vec)
+
+
+def compress(image):
+
+    shape = image.shape
+    img_vect = image.reshape(image.size)
+
+    r = run_length(img_vect)
+
+    print(r.shape)
+    return r
+
+
+def decompress(vec, shape):
+
+    dr = run_length_inv(vec)
+
+    img = dr.reshape(shape)
+
+    return img
