@@ -28,6 +28,7 @@ def shrink_average_image(image, rate):
 
     return shrinked
 
+
 def compute_spectrum(image):
 
     image = image.astype(np.float)
@@ -40,9 +41,18 @@ def compute_spectrum(image):
     spectrum = np.fft.fft2(image)
     spectrum = np.fft.fftshift(spectrum)
     spectrum = np.abs(spectrum)
-    sf.log_transform(spectrum)
 
     return spectrum
+
+
+def inverse_spectrum(spectrum: np.ndarray):
+
+    spectrum = np.fft.ifftshift(spectrum)
+    spectrum = np.fft.ifft2(spectrum)
+    spectrum = np.abs(spectrum)
+    image_filtered = spectrum[:spectrum.shape[0] // 2, :spectrum.shape[1] // 2]
+
+    return image_filtered
 
 
 def frequency_distance(spectrum):

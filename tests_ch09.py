@@ -33,10 +33,11 @@ def test_dilation(filename):
 def test_morphological_gradient(filename):
     image = io.imread(filename)
     image = color_models.rgb_to_grayscale(image.astype(np.float))
-    fig = plt.figure("Original vs Dilation")
+    fig = plt.figure("Original vs Gradient")
     fig.add_subplot(121)
     plt.imshow(image, cmap="gray")
     img_grad = mo.morphological_gradient(image)
+    # img_grad = mo.dilation(img_grad)
     fig.add_subplot(122)
     plt.imshow(img_grad, cmap="gray")
     plt.show()
