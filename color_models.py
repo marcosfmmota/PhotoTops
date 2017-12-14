@@ -57,7 +57,7 @@ def rgb_to_hsi(image):
             rmb = r - b
             gmb = g - b
             w = ((rmg + rmb) * 0.5) / (math.sqrt((rmg ** 2) + (rmb * gmb)) + ep)
-            hue = math.acos(w)/(2*math.pi)
+            hue = math.acos(w)/math.pi
 
             if b > g:
                 hue = 1 - (hue/(2*math.pi))
@@ -78,7 +78,7 @@ def hsi_to_rgb(image):
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
 
-            hue = image[i, j, 0] * (2*math.pi)
+            hue = image[i, j, 0] * math.pi
             sat = image[i, j, 1]
             intens = image[i, j, 2]
 
