@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from skimage import io
 
 import frequency_filters as ff
+import spatial_filters as sf
 
 
 def test_shrink_image(dirname, filename):
@@ -48,6 +49,7 @@ def test_compute_spectrum(dirname, filename):
     ax = fig.add_subplot(1, 2, 2)
     ax.set_title("Spectrum")
     spectrum = ff.compute_spectrum(image)
+    sf.log_transform(spectrum)
     plt.imshow(spectrum, cmap="gray")
     plt.show()
 
@@ -273,14 +275,14 @@ def test_batch_CH04():
     dir_name = "C:\\Users\\MarcosFelipe\\Documents\\PhotoTops\\DIP3E_CH04"
     # test_shrink_image(dir_name, "Fig0417(a)(barbara).tif")
     # test_shrink_average_image(dir_name, "Fig0417(a)(barbara).tif")
-    # test_compute_spectrum(dir_name, "Fig0424(a)(rectangle).tif")
-    # test_compute_spectrum(dir_name, "Fig0427(a)(woman).tif")
+    test_compute_spectrum(dir_name, "Fig0424(a)(rectangle).tif")
+    test_compute_spectrum(dir_name, "Fig0427(a)(woman).tif")
     # test_low_pass_ideal_filter(dir_name, "Fig0441(a)(characters_test_pattern).tif")
     # test_low_pass_butterworth_filter(dir_name, "Fig0441(a)(characters_test_pattern).tif")
     # test_low_pass_gaussian_filter(dir_name, "Fig0441(a)(characters_test_pattern).tif")
-    test_high_pass_ideal_filter(dir_name, "Fig0441(a)(characters_test_pattern).tif")
-    test_high_pass_butterworth_filter(dir_name, "Fig0441(a)(characters_test_pattern).tif")
-    test_high_pass_gaussian_filter(dir_name, "Fig0441(a)(characters_test_pattern).tif")
+    # test_high_pass_ideal_filter(dir_name, "Fig0441(a)(characters_test_pattern).tif")
+    # test_high_pass_butterworth_filter(dir_name, "Fig0441(a)(characters_test_pattern).tif")
+    # test_high_pass_gaussian_filter(dir_name, "Fig0441(a)(characters_test_pattern).tif")
     # test_bandreject_ideal_filter(dir_name, "Fig0462(a)(PET_image).tif")
     # test_bandreject_butterworth_filter(dir_name, "Fig0462(a)(PET_image).tif")
     # test_bandreject_gaussian_filter(dir_name, "Fig0462(a)(PET_image).tif")
